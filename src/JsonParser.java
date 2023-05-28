@@ -1,4 +1,58 @@
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+
+public class JsonParser {
+    public static void main(String[] args) {
+        String json = "[{\"фамилия\":\"Иванов\",\"оценка\":\"5\",\"предмет\":\"Математика\"}," +
+                "{\"фамилия\":\"Петрова\",\"оценка\":\"4\",\"предмет\":\"Информатика\"}," +
+                "{\"фамилия\":\"Краснов\",\"оценка\":\"5\",\"предмет\":\"Физика\"}]";
+
+        String[] students = json.split("},");
+        for (int i = 0; i < students.length; i++) {
+            students[i] = students[i].replace("[", "")
+                    .replace("]", "")
+                    .replace("\"", "")
+                    .replace("{", "");
+        }
+
+        String result = Arrays.toString(students);
+        System.out.println(result);
+        writeToLogFile(result);
+    }
+
+    private static void writeToLogFile(String result) {
+        try {
+            Logger logger = Logger.getLogger("MyLog");
+            File logFile = new File("log.txt");
+            if (!logFile.exists()) {
+                logFile.createNewFile();
+            }
+            FileHandler handler = new FileHandler("log.txt", true);
+            SimpleFormatter formatter = new SimpleFormatter();
+            handler.setFormatter(formatter);
+            logger.addHandler(handler);
+
+            BufferedWriter writer = new BufferedWriter(new FileWriter("result.txt"));
+            writer.write(result);
+            writer.close();
+
+            logger.info("Rezultat uspeshno zapisan v fail.");
+            handler.close();
+        } catch (IOException e) {
+            Logger.getLogger(JsonParser.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }
+}
+
+/******************************************************************************
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.logging.FileHandler;
@@ -67,3 +121,4 @@ public class JsonParser {
         }
     }
 }
+*******************************************************************************/
